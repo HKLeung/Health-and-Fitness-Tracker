@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Calorie Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            background-color: #f0f0f0; 
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px; 
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            margin-bottom: 15px;
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        button {
+            width: 100%; 
+            padding: 10px;
+            background-color: #007BFF; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+        }
+        button:hover {
+            background-color: #0056b3; 
+        }
+        h2 {
+            margin-top: 0; 
+            text-align: center; 
+        }
+        h3 {
+            margin-top: 20px; 
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Exercise Calorie Calculator</h2>
+
+        <label for="exercise">Choose exercise:</label>
+        <select id="exercise">
+            <option value="8">Running</option>
+            <option value="7">Cycling</option>
+            <option value="6">Swimming</option>
+            <option value="3.5">Walking</option>
+            <option value="5">Yoga</option>
+            <option value="7">Dancing</option>
+            <option value="6">Hiking</option>
+            <option value="8">Basketball</option>
+            <option value="7">Soccer</option>
+            <option value="5">Tennis</option>
+            <option value="4">Table Tennis</option>
+            <option value="3">Bowling</option>
+            <option value="6">Badminton</option>
+            <option value="5">Volleyball</option>
+        </select>
+
+        <label for="weight">Your weight(kg):</label>
+        <input type="number" id="weight" required>
+
+        <label for="duration">Duration(mins):</label>
+        <input type="number" id="duration" required>
+
+        <button onclick="calculateCalories()">Calculate</button>
+        <button onclick="clearData()">Clear Data</button>
+
+        <h3 id="result"></h3>
+    </div>
+
+    <script>
+        function calculateCalories() {
+            const met = parseFloat(document.getElementById("exercise").value);
+            const weight = parseFloat(document.getElementById("weight").value);
+            const duration = parseFloat(document.getElementById("duration").value);
+
+            if (isNaN(weight) || isNaN(duration)) {
+                alert("Please enter valid numbers for weight and duration.");
+                return;
+            }
+
+            const calories = met * 3.5 * weight / 200 * duration;
+            document.getElementById("result").innerText = 
+                `You burned approximately ${calories.toFixed(2)} calories.`;
+        }
+
+        function clearData() {
+            document.getElementById("exercise").selectedIndex = 0; 
+            document.getElementById("weight").value = ''; 
+            document.getElementById("duration").value = ''; 
+            document.getElementById("result").innerText = ''; 
+        }
+    </script>
+</body>
+</html>

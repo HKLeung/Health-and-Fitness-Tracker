@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Calorie Calculator Pro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 800px;
+            margin: 2rem 0;
+        }
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: 2px solid #007BFF;
+            border-radius: 0.8rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0,123,255,0.25);
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn {
+            background: #007BFF;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #0056b3;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .category-header {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007BFF;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .food-item {
+            padding: 1.2rem;
+            background: #f8f9fa;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .food-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .selected {
+            background: #007BFF !important;
+            color: white;
+            border-color: #0056b3;
+        }
+
+        .other-option {
+            font-style: italic;
+            color: #6c757d;
+            background: #e9ecef;
+        }
+
+        .custom-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-header {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        #food-log {
+            margin-top: 2rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .log-entry {
+            padding: 1rem;
+            margin: 0.8rem 0;
+            background: white;
+            border-radius: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .custom-badge {
+            background: #e3f2fd;
+            color: #007BFF;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+        .reference-link {
+            display: block;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #e3f2fd;
+            border-radius: 0.8rem;
+            text-decoration: none;
+            color: #007BFF;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .reference-link:hover {
+            background: #bbdefb;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .reference-link span {
+            vertical-align: middle;
+        }
+
+        .link-icon {
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="custom-modal" id="customModal" style="display: none;">
+        <div class="modal-header">🍴 Add other food</div>
+        <input type="text" id="customName" placeholder="Food name (e.g. ice cream）" class="modal-input">
+        <input type="number" id="customCalories" placeholder="Calories per unit" class="modal-input">
+        <div class="modal-buttons">
+            <button class="primary-btn" onclick="confirmCustom()">Confirm Add</button>
+            <button class="secondary-btn" onclick="cancelCustom()">Cancel</button>
+        </div>
+    </div>
+
+    <h1 style="text-align: center; color: #2c3e50; margin-bottom: 2rem;">📊 Food Calorie Calculator</h1>
+
+    <div class="food-grid">
+        <div class="main-category">
+            <div class="category-header">🍎 Fruits and vegetables</div>
+            <div class="food-item" data-food="Apple" data-calories="96">Apple</div>
+            <div class="food-item" data-food="Banana" data-calories="111">Banana</div>
+            <div class="food-item" data-food="Broccoli" data-calories="34">Broccoli</div>
+            <div class="food-item" data-food="Orange" data-calories="75">Orange</div>
+            <div class="food-item" data-food="Lettuce" data-calories="37">Lettuce</div>
+            <div class="food-item other-option" onclick="showCustomModal('vegetable')">Other</div>
+        </div>
+
+        <div class="main-category">
+            <div class="category-header">🍗 Meat</div>
+            <div class="food-item" data-food="Beef" data-calories="250">Beef</div>
+            <div class="food-item" data-food="Chicken" data-calories="165">Chicken</div>
+            <div class="food-item" data-food="Pork" data-calories="242">Pork</div>
+            <div class="food-item" data-food="Bacon" data-calories="81">Bacon</div>
+            <div class="food-item" data-food="Ham" data-calories="24">Ham</div>
+            <div class="food-item" data-food="Sausage" data-calories="79">Sausage</div>
+            <div class="food-item other-option" onclick="showCustomModal('meat')">Other</div>
+        </div>
+
+        <div class="main-category">
+            <div class="category-header">🍚 Starch</div>
+            <div class="food-item" data-food="Rice" data-calories="181">Rice</div>
+            <div class="food-item" data-food="Bread" data-calories="265">Bread</div>
+            <div class="food-item" data-food="Pasta" data-calories="131">Pasta</div>
+            <div class="food-item" data-food="Noodles" data-calories="176">Noodles</div>
+            <div class="food-item other-option" onclick="showCustomModal('staple')">Other</div>
+        </div>
+
+        <div class="main-category">
+            <div class="category-header">🥚 Protein</div>
+            <div class="food-item" data-food="Eggs" data-calories="78">Eggs</div>
+            <div class="food-item" data-food="Milk" data-calories="42">Milk</div>
+            <div class="food-item" data-food="Cheese" data-calories="402">Cheese</div>
+            <div class="food-item other-option" onclick="showCustomModal('protein')">Other</div>
+        </div>
+    </div>
+
+    <div style="margin: 2rem 0;">
+        <input type="number" id="quantity" placeholder="Please enter the quantity to be consumed (unit: serving)" min="1">
+        <button class="primary-btn" onclick="addFood()">➕Add food</button>
+        <button class="secondary-btn" onclick="clearData()">🧹Clear All Data</button>
+    </div>
+
+    <div id="result" style="font-size: 1.4rem; text-align: center; padding: 1.5rem; background: #007BFF; color: white; border-radius: 1rem;">
+        🔥 Total calories: <span id="totalCalories">0</span> Kcal
+    </div>
+
+    <div id="food-log">
+        <h3 style="color: #2c3e50; margin-bottom: 1rem;">📋Food Record</h3>
+        <div id="log-entries"></div>
+    </div>
+    <a href="https://www.calories.info/"
+       target="_blank"
+       class="reference-link"
+       rel="noopener noreferrer">
+        <span class="link-icon">📚</span>
+        <span>Need more data? View the complete food calorie database now</span>
+        <span style="margin-left: 0.5rem;">→</span>
+    </a>
+</div>
+
+
+<script>
+    let selectedFood = null;
+    let totalCalories = 0;
+    const foodLog = [];
+
+    function showCustomModal(category) {
+        document.getElementById('customModal').style.display = 'block';
+        document.getElementById('customName').focus();
+    }
+
+    function confirmCustom() {
+        const name = document.getElementById('customName').value.trim();
+        const calories = document.getElementById('customCalories').value;
+
+        if (!name) {
+            alert('Please enter the name of the food');
+            return;
+        }
+
+        if (!calories || isNaN(calories) || calories < 1) {
+            alert('Please enter a valid calorie value');
+            return;
+        }
+
+        selectedFood = {
+            name: name,
+            calories: parseInt(calories),
+            isCustom: true
+        };
+
+        document.getElementById('customModal').style.display = 'none';
+        document.getElementById('quantity').focus();
+    }
+
+    function cancelCustom() {
+        document.getElementById('customModal').style.display = 'none';
+        selectedFood = null;
+    }
+
+    document.querySelectorAll('.food-item:not(.other-option)').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.food-item').forEach(i => i.classList.remove('selected'));
+            this.classList.add('selected');
+
+            selectedFood = {
+                name: this.dataset.food,
+                calories: parseInt(this.dataset.calories),
+                isCustom: false
+            };
+
+            document.getElementById('quantity').value = '';
+        });
+    });
+
+    function addFood() {
+        if (!selectedFood) {
+            alert('Please select or add your food first!');
+            return;
+        }
+
+        const quantity = document.getElementById('quantity').value;
+        if (!quantity || quantity < 1) {
+            alert('Please enter a valid quantity (≥1)');
+            return;
+        }
+
+        const calories = selectedFood.calories * quantity;
+        totalCalories += calories;
+
+        foodLog.push({
+            name: selectedFood.name,
+            quantity: quantity,
+            calories: calories,
+            isCustom: selectedFood.isCustom,
+            timestamp: new Date().toLocaleString()
+        });
+
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        document.getElementById('totalCalories').textContent = totalCalories;
+        const logEntries = document.getElementById('log-entries');
+        logEntries.innerHTML = '';
+
+        foodLog.forEach((entry, index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'log-entry';
+            entryDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${index + 1}.</strong>
+                        ${entry.quantity}x ${entry.name}
+                        ${entry.isCustom ? '<span class="custom-badge">add</span>' : ''}
+                    </div>
+                    <div style="color: #6c757d;">
+                        ${entry.calories} Kcal
+                    </div>
+                </div>
+                <div style="color: #95a5a6; font-size: 0.9rem; margin-top: 0.5rem;">
+                    Add time: ${entry.timestamp}
+                </div>
+            `;
+            logEntries.appendChild(entryDiv);
+        });
+    }
+
+    function clearData() {
+        if (confirm('Are you sure you want to clear all data?')) {
+            selectedFood = null;
+            totalCalories = 0;
+            foodLog.length = 0;
+            document.getElementById('quantity').value = '';
+            document.querySelectorAll('.food-item').forEach(i => i.classList.remove('selected'));
+            updateDisplay();
+        }
+    }
+
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            if (document.getElementById('customModal').style.display === 'block') {
+                confirmCustom();
+            } else {
+                addFood();
+            }
+        }
+    });
+</script>
+</body>
+</html>
